@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PostRepository {
     private final Map<Long, Post> posts = new ConcurrentHashMap<>();
-    private long postIdCounter = 1;
+    private final AtomicLong postIdCounter = new AtomicLong(1);
 
     public List<Post> all() {
         return List.copyOf(posts.values());
@@ -21,7 +22,7 @@ public class PostRepository {
 
     public Post save(Post post) {
         if (post.getId() == 0) {
-            post.setId(postIdCounter++);
+            post.setId(postIdCounter.getAndIncrement());
         } else {
             if (!posts.containsKey(post.getId())) {
                 throw new IllegalArgumentException("Поста с id= " + post.getId() + " не существует");
